@@ -6,22 +6,20 @@
  * failedLoginCount (untuk AUTH-04 display), dan isLoading.
  */
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import type { User, LoginPayload, RegisterPayload } from '../../types/auth';
+import { storageGetUser, storageClearSession } from '../../services/mock/auth';
+
+// Fase 7: endpoint-service contract sudah dipindahkan ke src/services.
+// Namun AuthContext masih butuh helper penyimpanan lokal (storageGetUser/storageClearSession)
+// yang saat ini didefinisikan di services/mock/auth.
+// Jadi sementara authLogin/authLogout/authRegister diambil dari services entrypoint
+// agar mock↔api bisa ditukar tanpa mengubah komponen UI.
 import {
-  authLogin,
-  authLogout,
-  authRegister,
-  storageGetUser,
-  storageClearSession,
-} from '../../services/mock/auth';
+  authLogin as authLoginFromService,
+  authLogout as authLogoutFromService,
+  authRegister as authRegisterFromService,
+} from '../../services';
 
 // ============================================================
 // Context shape
@@ -78,7 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (payload: LoginPayload) => {
     setIsLoading(true);
     try {
-      const response = await authLogin(payload);
+      const response = await authLoginFromService(payload);
+
       setCurrentUser(response.user);
     } finally {
       setIsLoading(false);
@@ -88,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await authLogout();
+      await authLogoutFromService();
     } finally {
       setCurrentUser(null);
       storageClearSession();
@@ -99,7 +98,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = useCallback(async (payload: RegisterPayload): Promise<string> => {
     setIsLoading(true);
     try {
-      const response = await authRegister(payload);
+      const response = await authRegisterFromService(payload);
+
       // Simpan user sementara (email_verified: false) agar OtpVerifyPage bisa akses
       setCurrentUser(response.user);
       return payload.email;
@@ -109,9 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const markEmailVerified = useCallback(() => {
-    setCurrentUser((prev) =>
-      prev ? { ...prev, email_verified: true } : prev
-    );
+    setCurrentUser(prev => (prev ? { ...prev, email_verified: true } : prev));
   }, []);
 
   const value = useMemo<AuthContextValue>(
