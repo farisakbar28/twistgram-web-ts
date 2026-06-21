@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import { getStoryViewers } from '../../services/mock/story';
+import { getStoryViewers } from '../../services';
 import type { StoryView } from '../../types/index';
 import Modal from '../../components/common/Modal';
 import Avatar from '../../components/common/Avatar';

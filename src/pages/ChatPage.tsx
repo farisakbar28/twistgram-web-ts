@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
-import { getConversations, getMessages, sendMessage } from '../services/mock/chat';
-import type { ConversationWithMeta } from '../services/mock/chat';
+import { getConversations, getMessages, sendMessage } from '../services';
+import type { ConversationWithMeta } from '../services';
 import type { Message, Story } from '../types/index';
 import Avatar from '../components/common/Avatar';
 import Spinner from '../components/common/Spinner';

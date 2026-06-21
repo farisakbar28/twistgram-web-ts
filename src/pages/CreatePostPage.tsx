@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
-import { createPost } from '../services/mock/post';
+import { createPost } from '../services';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import { useToast } from '../components/common/Toast';

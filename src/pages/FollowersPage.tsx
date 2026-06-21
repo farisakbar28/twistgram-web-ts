@@ -13,7 +13,8 @@ import {
   removeFollower,
   followUser,
   unfollowUser,
-} from '../services/mock/social';
+  getProfileByUsername,
+} from '../services';
 import type { UserProfile } from '../types/social';
 import UserListItem from '../components/common/UserListItem';
 import FollowButton from '../components/common/FollowButton';
@@ -37,8 +38,6 @@ const FollowersPage: React.FC = () => {
     if (!username) return;
     setIsLoading(true);
     try {
-      // Ambil profil dulu untuk dapat ID
-      const { getProfileByUsername } = await import('../services/mock/social');
       const profile = await getProfileByUsername(username, currentUser?.id ?? null);
       setTargetUserId(profile.id);
       const data = await getFollowers(profile.id, currentUser?.id ?? null);

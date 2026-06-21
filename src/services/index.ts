@@ -51,6 +51,9 @@ export const authRecoverUsername = auth.authRecoverUsername;
 export const authRecoverEmail = auth.authRecoverEmail;
 export const checkUsernameAvailable = auth.checkUsernameAvailable;
 export const checkEmailAvailable = auth.checkEmailAvailable;
+export const getLoginLockState = useMock
+  ? mockAuth.getLoginLockState
+  : (_identifier: string) => ({ locked: false, remainingMs: 0 });
 
 export const getMyProfile = social.getMyProfile;
 export const getProfileByUsername = social.getProfileByUsername;
@@ -111,5 +114,8 @@ export const getUnreadNotificationsCount = notification.getUnreadNotificationsCo
 export const searchUsers = search.searchUsers;
 export const searchHashtags = search.searchHashtags;
 export const getHashtagPosts = search.getHashtagPosts;
+
+export type { ConversationWithMeta } from './api/chat';
+export type { StoryGroup } from './mock/story';
 
 

@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../features/auth/AuthContext';
-import { searchUsers, searchHashtags, getHashtagPosts } from '../services/mock/search';
+import {
+  searchUsers,
+  searchHashtags,
+  getHashtagPosts,
+  getProfileByUsername,
+  followUser,
+  unfollowUser,
+} from '../services';
 import type { User, Post } from '../types/index';
+import type { FollowStatus } from '../types/social';
 import Avatar from '../components/common/Avatar';
 import Spinner from '../components/common/Spinner';
 import Input from '../components/common/Input';
@@ -9,7 +17,6 @@ import FollowButton from '../components/common/FollowButton';
 import { Search, Hash, Users as UsersIcon, ArrowLeft, Heart, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../components/common/Toast';
-import { mockFollows, mockBlocks } from '../services/mock/social';
 
 // ============================================================
 // Constants
@@ -34,23 +41,13 @@ const SearchPage: React.FC = () => {
   const [tagsResult, setTagsResult] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [followTrigger, setFollowTrigger] = useState(0);
+  const [followStatusMap, setFollowStatusMap] = useState<Record<string, FollowStatus>>({});
 
-  const getFollowStatus = (targetUserId: string) => {
-    const isBlocked = mockBlocks.some(
-      b => (b.blocker_id === currentUser!.id && b.blocked_id === targetUserId) ||
-           (b.blocker_id === targetUserId && b.blocked_id === currentUser!.id)
-    );
-    if (isBlocked) return 'blocked';
-
-    const follow = mockFollows.find(f => f.follower_id === currentUser!.id && f.following_id === targetUserId);
-    if (!follow) return 'not_following';
-    if (follow.status === 'pending') return 'pending';
-    return 'following';
-  };
+  const getFollowStatus = (targetUserId: string): FollowStatus =>
+    followStatusMap[targetUserId] ?? 'not_following';
 
   const handleFollow = async (targetUserId: string) => {
     try {
-      const { followUser } = await import('../services/mock/social');
       await followUser(currentUser!.id, targetUserId);
       toast.success('Berhasil mengikuti!');
       setFollowTrigger(prev => prev + 1);
@@ -61,7 +58,6 @@ const SearchPage: React.FC = () => {
 
   const handleUnfollow = async (targetUserId: string) => {
     try {
-      const { unfollowUser } = await import('../services/mock/social');
       await unfollowUser(currentUser!.id, targetUserId);
       toast.success('Batal mengikuti.');
       setFollowTrigger(prev => prev + 1);
@@ -78,15 +74,66 @@ const SearchPage: React.FC = () => {
   // Default suggestions
   const [defaultUsers, setDefaultUsers] = useState<User[]>([]);
 
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const loadFollowStatuses = async () => {
+      const uniqueUsers = [...usersResult, ...defaultUsers];
+      if (uniqueUsers.length === 0) {
+        setFollowStatusMap({});
+        return;
+      }
+
+      const entries = await Promise.all(
+        uniqueUsers.map(async (user) => {
+          try {
+            const profile = await getProfileByUsername(user.username, currentUser.id);
+            return [user.id, profile.follow_status] as const;
+          } catch {
+            return [user.id, 'not_following'] as const;
+          }
+        })
+      );
+
+      setFollowStatusMap(Object.fromEntries(entries));
+    };
+
+    loadFollowStatuses();
+  }, [currentUser, usersResult, defaultUsers, followTrigger]);
+
   // Load default user recommendations
   useEffect(() => {
     if (!currentUser) return;
     const fetchDefaultSuggestions = async () => {
       try {
-        const { MOCK_USERS } = await import('../services/mock/social');
-        // Exclude current user and filter top 4 users
-        const suggestions = MOCK_USERS.filter(u => u.id !== currentUser.id).slice(0, 4);
-        setDefaultUsers(suggestions);
+        const candidateUsernames = ['claraclarissa', 'andiwirawan', 'sitirahayu', 'budisantoso'];
+        const suggestions = await Promise.all(
+          candidateUsernames
+            .filter(username => username !== currentUser.username)
+            .map(async (username) => {
+              try {
+                const profile = await getProfileByUsername(username, currentUser.id);
+                return {
+                  id: profile.id,
+                  name: profile.name,
+                  username: profile.username,
+                  email: profile.email,
+                  phone: profile.phone,
+                  phone_verified: profile.phone_verified,
+                  email_verified: profile.email_verified,
+                  bio: profile.bio,
+                  avatar_url: profile.avatar_url,
+                  is_private: profile.is_private,
+                  created_at: profile.created_at,
+                  updated_at: profile.updated_at,
+                } as User;
+              } catch {
+                return null;
+              }
+            })
+        );
+
+        setDefaultUsers(suggestions.filter(Boolean).slice(0, 4) as User[]);
       } catch (err) {
         console.error('Failed to load default search suggestions:', err);
       }

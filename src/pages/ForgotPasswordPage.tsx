@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowLeft, AlertCircle, KeyRound } from 'lucide-react';
-import { authForgotPassword } from '../services/mock/auth';
+import { authForgotPassword } from '../services';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useToast } from '../components/common/Toast';

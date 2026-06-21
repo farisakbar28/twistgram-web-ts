@@ -34,11 +34,11 @@ import {
   unfollowUser,
   blockUser,
   reportContent,
-} from '../services/mock/social';
+} from '../services';
 import {
   getUserPosts,
   getUserSavedPosts,
-} from '../services/mock/post';
+} from '../services';
 import type { UserProfile } from '../types/social';
 import type { ReportReason } from '../types/social';
 import type { Post } from '../types/index';

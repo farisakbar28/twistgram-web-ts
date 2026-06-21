@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import { getStoryFeed } from '../../services/mock/story';
-import type { StoryGroup } from '../../services/mock/story';
+import { getStoryFeed } from '../../services';
+import type { StoryGroup } from '../../services';
 import Avatar from '../../components/common/Avatar';
 import Spinner from '../../components/common/Spinner';
 import { Plus } from 'lucide-react';

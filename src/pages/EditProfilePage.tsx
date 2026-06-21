@@ -30,7 +30,7 @@ import {
   updatePrivacy,
   getInterests,
   updateInterests,
-} from '../services/mock/social';
+} from '../services';
 import { INTEREST_CATEGORIES } from '../types/social';
 import type { UserProfile } from '../types/social';
 import Avatar from '../components/common/Avatar';

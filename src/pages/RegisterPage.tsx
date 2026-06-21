@@ -27,7 +27,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useAuth } from '../features/auth/AuthContext';
-import { checkUsernameAvailable, checkEmailAvailable } from '../services/mock/auth';
+import { checkUsernameAvailable, checkEmailAvailable } from '../services';
 import { suggestUsername } from '../utils';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';

@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Home, Search, Plus, Send } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import { useAuth } from '../../features/auth/AuthContext';
+import { getUnreadMessagesCount } from '../../services';
 
 // ============================================================
 // Component
@@ -18,7 +19,6 @@ const BottomNav: React.FC = () => {
     if (!currentUser) return;
     const fetchChatCount = async () => {
       try {
-        const { getUnreadMessagesCount } = await import('../../services/mock/chat');
         const count = await getUnreadMessagesCount(currentUser.id);
         setUnreadChat(count);
       } catch {}
@@ -117,4 +117,3 @@ const BottomNav: React.FC = () => {
 };
 
 export default BottomNav;
-

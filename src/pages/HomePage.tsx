@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../features/auth/AuthContext';
-import { getFeed } from '../services/mock/post';
+import {
+  getFeed,
+  getProfileByUsername,
+  followUser,
+  unfollowUser,
+} from '../services';
 
 import type { Post } from '../types/index';
 import type { UserProfile } from '../types/social';
@@ -16,7 +21,7 @@ import { Sparkles, Users } from 'lucide-react';
 import { StoriesBar } from '../features/story/StoriesBar';
 import { StoryViewer } from '../features/story/StoryViewer';
 import { CreateStoryModal } from '../features/story/CreateStoryModal';
-import type { StoryGroup } from '../services/mock/story';
+import type { StoryGroup } from '../services';
 
 const HomePage: React.FC = () => {
   const { currentUser } = useAuth();
@@ -50,8 +55,6 @@ const HomePage: React.FC = () => {
   const fetchSuggestions = useCallback(async () => {
     if (!currentUser) return;
     try {
-      // Mengambil profil Clara (user-002), Andi (user-003), Budi (user-005)
-      const { getProfileByUsername } = await import('../services/mock/social');
       const usersToFetch = ['claraclarissa', 'andiwirawan', 'budisantoso'];
       const data: UserProfile[] = [];
       for (const username of usersToFetch) {
@@ -76,8 +79,7 @@ const HomePage: React.FC = () => {
     async (targetUserId: string) => {
       if (!currentUser) return;
       try {
-        const social = await import('../services/mock/social');
-        await social.followUser(currentUser.id, targetUserId);
+        await followUser(currentUser.id, targetUserId);
         // refresh UI agar follow_status/tombol konsisten dengan state mock server
         await fetchSuggestions();
       } catch {
@@ -91,8 +93,7 @@ const HomePage: React.FC = () => {
     async (targetUserId: string) => {
       if (!currentUser) return;
       try {
-        const social = await import('../services/mock/social');
-        await social.unfollowUser(currentUser.id, targetUserId);
+        await unfollowUser(currentUser.id, targetUserId);
         await fetchSuggestions();
       } catch {
         // ignore

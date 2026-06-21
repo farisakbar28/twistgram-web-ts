@@ -5,7 +5,7 @@ import type { Comment } from '../../types/index';
 import Avatar from './Avatar';
 import Spinner from './Spinner';
 import { formatRelativeTime } from '../../utils';
-import { getPostComments, createComment, deleteComment } from '../../services/mock/post';
+import { getPostComments, createComment, deleteComment } from '../../services';
 import { useToast } from './Toast';
 
 interface CommentSectionProps {

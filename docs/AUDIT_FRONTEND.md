@@ -92,9 +92,9 @@
 
 | Lokasi | Temuan | Urgensi | Rekomendasi |
 |---|---|---:|---|
-| Hampir seluruh pages/components/features; lihat import `services/mock/*` | Switch mock/API Fase 7 tidak efektif. Hampir seluruh UI langsung mengimpor mock; hanya sebagian AuthContext memakai `src/services/index.ts`. Mengubah `VITE_USE_MOCK=false` tidak memindahkan aplikasi ke API asli. | **Kritis** | Larang import mock dari UI melalui lint rule dan migrasikan semua consumer ke service facade. |
+| Hampir seluruh pages/components/features; lihat import `services/mock/*` | Switch mock/API Fase 7 tidak efektif. Hampir seluruh UI langsung mengimpor mock; hanya sebagian AuthContext memakai `src/services/index.ts`. Mengubah `VITE_USE_MOCK=false` tidak memindahkan aplikasi ke API asli. | **Kritis** | ✅ Selesai — Fase A5 memigrasikan consumer UI ke `src/services/index.ts` sehingga import langsung `services/mock/*` tidak lagi bocor di layer pages/components/features/routes. |
 | `src/features/auth/AuthContext.tsx`, `src/services/apiClient.ts`, `src/services/mock/auth.ts` | API login response tidak disimpan. `apiClient` membaca key `access_token`, sedangkan mock menyimpan JSON pada `twistgram_tokens`; hydration/logout tetap memakai helper mock. Request API setelah login berpotensi tanpa Bearer token dan sesi hilang saat refresh. | **Kritis** | ✅ Selesai (mock-level) — Fase A2 memusatkan storage user/token di adapter sesi tunggal yang dipakai login, register, verify OTP, hydrate, logout, dan request interceptor. |
-| `.env.example`, `src/services/index.ts` | `VITE_API_BASE_URL` sudah ada, tetapi `VITE_USE_MOCK` yang mengontrol switch tidak dicantumkan. | Sedang | Tambahkan variable beserta nilai/default dan penjelasan mode. |
+| `.env.example`, `src/services/index.ts` | `VITE_API_BASE_URL` sudah ada, tetapi `VITE_USE_MOCK` yang mengontrol switch tidak dicantumkan. | Sedang | ✅ Selesai — Fase A5 menambahkan `VITE_USE_MOCK` ke `.env.example` beserta penjelasan mode mock vs API. |
 | `src/services/api/auth.ts`, `notification.ts`, `chat.ts`, `story.ts` | Ada endpoint yang tidak tercantum di SRS: `/auth/check-username`, `/auth/check-email`, `/notifications/read-all`, `POST /notifications`; unread count dan `hasActiveStory` juga tidak punya kontrak. | Sedang | Tambahkan endpoint resmi ke contract atau ubah helper agar diturunkan dari response endpoint yang sah. |
 | `src/services/api/*.ts`, SRS §11 | SRS hanya mencantumkan method/path, belum request/response body. Implementasi mencampur camelCase dan snake_case serta selalu mengasumsikan `res.data` adalah entity langsung. Keselarasan response shape tidak dapat dikonfirmasi. | Sedang | Buat OpenAPI/contract document sebelum coding backend dan tetapkan envelope/error/pagination/upload shape. |
 | `src/services/apiClient.ts:37-43` | Refresh token masih TODO. Tidak ada retry request, token rotation, atau forced logout saat refresh gagal. | Sedang | ⏳ Tuntas sebagian — Fase A2 sudah memindahkan pembacaan access token ke session adapter tunggal. `// TODO(backend):` retry/rotation tetap menunggu backend auth asli. |
@@ -127,7 +127,7 @@ Frontend saat ini layak sebagai demo UI berbasis mock, tetapi **belum siap langs
 1. Story reply tidak menghasilkan DM. ✅ Selesai di Fase A4.
 2. Registrasi/session user baru terpecah antar mock store.
 3. Fix notifikasi follow masih bergantung pada data seed yang tidak konsisten dan manipulasi storage. ✅ Selesai di Fase A3 (mock-level).
-4. UI melewati service switch dan mengimpor mock secara langsung.
+4. UI melewati service switch dan mengimpor mock secara langsung. ✅ Selesai di Fase A5.
 5. Token/session API tidak disimpan atau dipasang secara konsisten. ✅ Selesai di Fase A2 (mock-level); sisa refresh-token backend tetap terpisah.
 
 Update tindak lanjut:
@@ -135,3 +135,4 @@ Update tindak lanjut:
 - Fase A2 (21 Juni 2026): session adapter tunggal sudah dipakai oleh mock auth, AuthContext, OTP verification, dan `apiClient`; register/verify/login/logout kini konsisten di atas storage yang sama.
 - Fase A3 (21 Juni 2026): notifikasi follow request kini direferensikan ke `follow.id`, seed invalid direkonsiliasi, dan approve/decline tidak lagi menebak request dari kombinasi actor/recipient.
 - Fase A4 (21 Juni 2026): reply story kini membuat DM sungguhan dengan `reply_to_story_id`, lalu mengarahkan user ke conversation terkait supaya pesan balasan langsung terlihat.
+- Fase A5 (21 Juni 2026): import data UI dipusatkan ke `src/services/index.ts`, helper façade tambahan dipasang untuk kebutuhan login/search/chat/story, dan `.env.example` kini mendokumentasikan `VITE_USE_MOCK`.

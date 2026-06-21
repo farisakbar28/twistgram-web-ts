@@ -13,7 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Eye, EyeOff, Check, X, AlertCircle } from 'lucide-react';
-import { authResetPassword } from '../services/mock/auth';
+import { authResetPassword } from '../services';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useToast } from '../components/common/Toast';

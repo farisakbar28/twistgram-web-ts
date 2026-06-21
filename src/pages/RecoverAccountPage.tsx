@@ -21,7 +21,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserSearch, MailWarning, User, Mail, Phone, ArrowLeft, AlertCircle, HelpCircle } from 'lucide-react';
-import { authRecoverUsername, authRecoverEmail } from '../services/mock/auth';
+import { authRecoverUsername, authRecoverEmail } from '../services';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 

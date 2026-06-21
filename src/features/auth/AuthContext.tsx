@@ -8,14 +8,12 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import type { User, LoginPayload, RegisterPayload } from '../../types/auth';
-import { storageClearSession } from '../../services/mock/auth';
 import { getStoredUser } from '../../services/session';
+import { clearStoredSession } from '../../services/session';
 
 // Fase 7: endpoint-service contract sudah dipindahkan ke src/services.
-// Namun AuthContext masih butuh helper penyimpanan lokal (storageGetUser/storageClearSession)
-// yang saat ini didefinisikan di services/mock/auth.
-// Jadi sementara authLogin/authLogout/authRegister diambil dari services entrypoint
-// agar mock↔api bisa ditukar tanpa mengubah komponen UI.
+// AuthContext tetap hydrate dari adapter session lokal, sementara operasi auth
+// berjalan melalui services entrypoint agar mock↔api bisa ditukar tanpa ubah UI.
 import {
   authLogin as authLoginFromService,
   authLogout as authLogoutFromService,
@@ -90,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authLogoutFromService();
     } finally {
       setCurrentUser(null);
-      storageClearSession();
+      clearStoredSession();
       setIsLoading(false);
     }
   }, []);

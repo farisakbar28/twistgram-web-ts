@@ -4,7 +4,7 @@ import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-r
 import type { Post } from '../../types/index';
 import Avatar from './Avatar';
 import { formatCount, formatRelativeTime } from '../../utils';
-import { likePost, unlikePost, savePost, unsavePost, sharePost } from '../../services/mock/post';
+import { likePost, unlikePost, savePost, unsavePost, sharePost } from '../../services';
 import { useToast } from './Toast';
 
 interface PostCardProps {

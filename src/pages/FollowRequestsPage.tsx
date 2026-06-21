@@ -12,7 +12,7 @@ import {
   getFollowRequests,
   approveFollowRequest,
   declineFollowRequest,
-} from '../services/mock/social';
+} from '../services';
 import type { FollowRequest } from '../types/social';
 import UserListItem from '../components/common/UserListItem';
 import Button from '../components/common/Button';

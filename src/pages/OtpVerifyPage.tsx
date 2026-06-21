@@ -16,7 +16,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ShieldCheck, RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
-import { authVerifyOtp, authForgotPassword, authRecoverUsername, authRecoverEmail } from '../services/mock/auth';
+import { authVerifyOtp, authForgotPassword, authRecoverUsername, authRecoverEmail } from '../services';
 import { useAuth } from '../features/auth/AuthContext';
 import type { OtpPurpose } from '../types/auth';
 import Button from '../components/common/Button';

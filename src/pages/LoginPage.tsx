@@ -15,7 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../features/auth/AuthContext';
-import { getLoginLockState } from '../services/mock/auth';
+import { getLoginLockState } from '../services';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useToast } from '../components/common/Toast';

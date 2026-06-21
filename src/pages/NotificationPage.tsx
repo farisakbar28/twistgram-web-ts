@@ -4,11 +4,11 @@ import {
   getNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
-} from '../services/mock/notification';
+} from '../services';
 import {
   approveFollowRequest,
   declineFollowRequest,
-} from '../services/mock/social';
+} from '../services';
 import type { Notification } from '../types/index';
 import Avatar from '../components/common/Avatar';
 import Spinner from '../components/common/Spinner';

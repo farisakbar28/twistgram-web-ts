@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { deleteStory, markStoryViewed } from '../../services/mock/story';
-import type { StoryGroup } from '../../services/mock/story';
-import { startConversation, sendMessage } from '../../services/mock/chat';
+import { deleteStory, markStoryViewed, startConversation, sendMessage } from '../../services';
+import type { StoryGroup } from '../../services';
 import { StoryViewersModal } from './StoryViewersModal';
 import { useToast } from '../../components/common/Toast';
 import { ChevronLeft, ChevronRight, Trash2, Eye, Send, X, Play, Pause } from 'lucide-react';

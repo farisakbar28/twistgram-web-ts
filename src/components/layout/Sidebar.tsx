@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Home, Search, Send, Bell, User, PlusCircle, LogOut, Settings } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import { useAuth } from '../../features/auth/AuthContext';
+import { getUnreadMessagesCount, getUnreadNotificationsCount } from '../../services';
 
 // ============================================================
 // Types & Navigation Config
@@ -30,8 +31,6 @@ const Sidebar: React.FC = () => {
     if (!currentUser) return;
     const fetchCounts = async () => {
       try {
-        const { getUnreadMessagesCount } = await import('../../services/mock/chat');
-        const { getUnreadNotificationsCount } = await import('../../services/mock/notification');
         const chatCount = await getUnreadMessagesCount(currentUser.id);
         const notifCount = await getUnreadNotificationsCount(currentUser.id);
         setUnreadChat(chatCount);

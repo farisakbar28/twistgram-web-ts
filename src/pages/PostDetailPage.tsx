@@ -12,7 +12,7 @@ import {
   archivePost,
   unarchivePost,
   updatePostCaption,
-} from '../services/mock/post';
+} from '../services';
 import type { Post } from '../types/index';
 import Avatar from '../components/common/Avatar';
 import Button from '../components/common/Button';

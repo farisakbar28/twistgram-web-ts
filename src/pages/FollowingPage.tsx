@@ -11,7 +11,8 @@ import {
   getFollowing,
   followUser,
   unfollowUser,
-} from '../services/mock/social';
+  getProfileByUsername,
+} from '../services';
 import type { UserProfile } from '../types/social';
 import UserListItem from '../components/common/UserListItem';
 import FollowButton from '../components/common/FollowButton';
@@ -33,7 +34,6 @@ const FollowingPage: React.FC = () => {
     if (!username) return;
     setIsLoading(true);
     try {
-      const { getProfileByUsername } = await import('../services/mock/social');
       const profile = await getProfileByUsername(username, currentUser?.id ?? null);
       setTargetUserId(profile.id);
       const data = await getFollowing(profile.id, currentUser?.id ?? null);
