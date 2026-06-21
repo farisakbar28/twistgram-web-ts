@@ -32,7 +32,7 @@
 | `src/pages/CreatePostPage.tsx`, `src/services/mock/post.ts`, `src/types/index.ts` | MVP tag pengguna pada post belum tersedia. Tidak ada input tagged user, model `PostTag`, pemanggilan notifikasi mention, atau hak pengguna untuk menghapus tag sesuai CNT-05. | Sedang | Tambahkan kontrak tag yang lengkap sebelum endpoint post difinalkan. |
 | `src/components/common/CommentSection.tsx`, `src/services/mock/post.ts`, `src/services/api/post.ts` | MVP like/unlike komentar belum diimplementasikan, walaupun endpoint `POST /comments/:id/like` tercantum di SRS. | Sedang | Tambahkan service contract dan state UI like komentar. |
 | `src/components/common/PostCard.tsx`, `src/pages/PostDetailPage.tsx` | MVP share hanya menyalin link. Opsi share ke Direct Message internal belum ada. | Sedang | Definisikan flow pemilihan conversation/recipient dan kontrak share ke DM. |
-| `src/features/story/StoryViewer.tsx:151-158` | Reply story hanya menampilkan toast sukses; tidak memanggil `startConversation`/`sendMessage` dan tidak membuat message dengan `reply_to_story_id`. Ini melanggar CNT-02. | **Kritis** | Implementasikan reply story melalui service chat dan verifikasi message benar-benar muncul di thread. |
+| `src/features/story/StoryViewer.tsx:151-158` | Reply story hanya menampilkan toast sukses; tidak memanggil `startConversation`/`sendMessage` dan tidak membuat message dengan `reply_to_story_id`. Ini melanggar CNT-02. | **Kritis** | ✅ Selesai — Fase A4 menghubungkan reply story ke `startConversation` + `sendMessage`, menyimpan `reply_to_story_id`, dan membuka thread chat hasilnya agar pesan langsung terlihat. |
 | `src/services/mock/chat.ts`, `src/services/api/chat.ts`, `src/pages/ChatPage.tsx` | Riwayat chat belum paginated. `getMessages` selalu mengembalikan seluruh pesan dan UI tidak memiliki cursor/load-more. | Sedang | Gunakan `PaginatedResponse<Message>` dan tetapkan cursor/limit pada kontrak Go. |
 | `src/pages/ProfilePage.tsx`, `src/services/mock/social.ts:546` | Service unblock tersedia tetapi tidak ada UI/route untuk melihat akun yang diblokir atau melakukan unblock. | Sedang | Tambahkan entrypoint pengelolaan blocked users atau mekanisme unblock yang dapat dicapai pengguna. |
 | `src/pages/ProfilePage.tsx:356-359`, `src/services/mock/chat.ts:229` | Tombol **Pesan** tidak memiliki handler. `startConversation` tersedia tetapi tidak pernah dipakai oleh UI. | Sedang | Hubungkan tombol ke `startConversation`, lalu navigasikan ke conversation terpilih. |
@@ -124,7 +124,7 @@
 
 Frontend saat ini layak sebagai demo UI berbasis mock, tetapi **belum siap langsung dihubungkan ke backend Go**. Lima blocker kritis adalah:
 
-1. Story reply tidak menghasilkan DM.
+1. Story reply tidak menghasilkan DM. ✅ Selesai di Fase A4.
 2. Registrasi/session user baru terpecah antar mock store.
 3. Fix notifikasi follow masih bergantung pada data seed yang tidak konsisten dan manipulasi storage. ✅ Selesai di Fase A3 (mock-level).
 4. UI melewati service switch dan mengimpor mock secara langsung.
@@ -134,3 +134,4 @@ Update tindak lanjut:
 - Fase A1 (21 Juni 2026): store mock terpusat sudah dibuat di `src/services/mock/database.ts`; temuan duplikasi data mock selesai dan blocker registrasi lintas store turun menjadi sisa masalah session/hydration yang dijadwalkan ke Fase A2.
 - Fase A2 (21 Juni 2026): session adapter tunggal sudah dipakai oleh mock auth, AuthContext, OTP verification, dan `apiClient`; register/verify/login/logout kini konsisten di atas storage yang sama.
 - Fase A3 (21 Juni 2026): notifikasi follow request kini direferensikan ke `follow.id`, seed invalid direkonsiliasi, dan approve/decline tidak lagi menebak request dari kombinasi actor/recipient.
+- Fase A4 (21 Juni 2026): reply story kini membuat DM sungguhan dengan `reply_to_story_id`, lalu mengarahkan user ke conversation terkait supaya pesan balasan langsung terlihat.

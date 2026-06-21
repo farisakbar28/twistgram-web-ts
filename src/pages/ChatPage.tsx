@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import { getConversations, getMessages, sendMessage } from '../services/mock/chat';
 import type { ConversationWithMeta } from '../services/mock/chat';
@@ -40,6 +40,7 @@ const getStoryFromDb = (storyId: string): Story | null => {
 const ChatPage: React.FC = () => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const location = useLocation();
 
   // Conversations states
   const [conversations, setConversations] = useState<ConversationWithMeta[]>([]);
@@ -62,11 +63,22 @@ const ChatPage: React.FC = () => {
 
   // Track last message id for the active conversation to avoid unnecessary refetches/spinners
   const lastActiveLastMessageIdRef = useRef<string | null>(null);
+  const pendingConversationIdRef = useRef<string | null>(
+    (location.state as { conversationId?: string } | null)?.conversationId ?? null
+  );
 
   // Keep ref in sync to avoid stale reads without re-creating polling callbacks
   useEffect(() => {
     activeConvRef.current = activeConv;
   }, [activeConv]);
+
+  useEffect(() => {
+    const requestedConversationId =
+      (location.state as { conversationId?: string } | null)?.conversationId ?? null;
+    if (requestedConversationId) {
+      pendingConversationIdRef.current = requestedConversationId;
+    }
+  }, [location.state]);
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -104,6 +116,18 @@ const ChatPage: React.FC = () => {
           const updated = data.find(c => c.id === prev.id);
           return updated ?? prev;
         });
+
+        if (pendingConversationIdRef.current) {
+          const requestedConversation = data.find(
+            c => c.id === pendingConversationIdRef.current
+          );
+
+          if (requestedConversation) {
+            setActiveConv(requestedConversation);
+            setActiveTab(requestedConversation.is_request ? 'requests' : 'main');
+            pendingConversationIdRef.current = null;
+          }
+        }
       } catch (err) {
         console.error('Failed to load conversations:', err);
       } finally {

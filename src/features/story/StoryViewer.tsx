@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { deleteStory, markStoryViewed } from '../../services/mock/story';
 import type { StoryGroup } from '../../services/mock/story';
+import { startConversation, sendMessage } from '../../services/mock/chat';
 import { StoryViewersModal } from './StoryViewersModal';
 import { useToast } from '../../components/common/Toast';
 import { ChevronLeft, ChevronRight, Trash2, Eye, Send, X, Play, Pause } from 'lucide-react';
@@ -36,6 +38,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 }) => {
   const { currentUser } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
 
   const [groupIndex, setGroupIndex] = useState(initialGroupIndex);
   const [storyIndex, setStoryIndex] = useState(0);
@@ -43,6 +46,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [isViewersOpen, setIsViewersOpen] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [isReplying, setIsReplying] = useState(false);
 
   // Get active group and active story
   const activeGroup = storyGroups[groupIndex];
@@ -146,14 +150,31 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     }
   };
 
-  const handleReplySubmit = (e: React.FormEvent) => {
+  const handleReplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!replyText.trim()) return;
+    if (!currentUser || !activeStory || !replyText.trim()) return;
+    if (activeStory.user_id === currentUser.id) return;
 
-    // Direct reply simulation
-    toast.success('Balasan cerita terkirim sebagai pesan langsung!');
-    setReplyText('');
-    setIsPaused(false);
+    setIsReplying(true);
+    try {
+      const conversation = await startConversation(currentUser.id, activeStory.user_id);
+      await sendMessage(conversation.id, currentUser.id, {
+        content: replyText.trim(),
+        replyToStoryId: activeStory.id,
+      });
+
+      setReplyText('');
+      setIsPaused(false);
+      onClose();
+      toast.success('Balasan cerita terkirim sebagai pesan langsung.');
+      navigate('/chat', {
+        state: { conversationId: conversation.id },
+      });
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal mengirim balasan cerita.');
+    } finally {
+      setIsReplying(false);
+    }
   };
 
   const handleMouseDown = () => {
@@ -310,7 +331,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
               />
               <button
                 type="submit"
-                disabled={!replyText.trim()}
+                disabled={isReplying || !replyText.trim()}
                 className="h-10 w-10 flex items-center justify-center bg-white text-neutral-900 rounded-xl font-semibold hover:bg-neutral-100 disabled:opacity-50 transition-all cursor-pointer shrink-0"
               >
                 <Send className="h-4 w-4" />

@@ -202,6 +202,15 @@ export const sendMessage = async (
   getMessagesDb().push(newMessage);
   persistMockDb();
 
+  if (payload.replyToStoryId) {
+    try {
+      const { createNotification } = await import('./notification');
+      await createNotification(recipientId, senderId, 'story_reply', payload.replyToStoryId);
+    } catch {
+      // ignore mock notification failure
+    }
+  }
+
   const recipient = MOCK_USERS.find((user) => user.id === recipientId);
   if (recipient && recipient.id !== 'user-001') {
     setTimeout(async () => {
